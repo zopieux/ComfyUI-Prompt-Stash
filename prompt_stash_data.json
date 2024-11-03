@@ -1,0 +1,8 @@
+{
+  "saved_prompts": {
+    "Instructions": "📝 Quick Tips:\n\n• 'Use Input': Takes text from input node\n• 'Use Prompt': Uses text from prompt box (input node won't run)\n\n• Prompt will only save if 'Save Name' is filled\n• Saving to an existing name will overwrite it\n\n• Saved prompts persist between sessions\n• All nodes share the same prompt library",
+    "positive_demo": "masterpiece, best quality, highly detailed",
+    "negative_demo": "worst quality, bad anatomy, text, error, jpeg artifacts, blurry"
+  },
+  "node_states": {}
+}
