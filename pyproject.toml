@@ -1,13 +1,14 @@
 [project]
-name = "comfyui-prompt-stash-saver"
+name = "confyui-node-prompt-stash-saver"
+description = ""
 version = "1.1.0"
-description = "A ComfyUI node for saving and managing prompts with persistent storage"
-license = { text = "Apache 2.0 License" }
+license = {file = "LICENSE"}
 
 [project.urls]
-Homepage = "https://github.com/phazei/ConfyUI-node-prompt-stash-saver/"
+Repository = "https://github.com/phazei/ConfyUI-node-prompt-stash-saver"
+#  Used by Comfy Registry https://comfyregistry.org
 
 [tool.comfy]
-# These are the fields needed for the Comfy Registry if you decide to publish later
-PublisherId = "" # You'd add your publisher ID here
+PublisherId = "phazei"
 DisplayName = "Prompt Stash Saver Node"
+Icon = ""
