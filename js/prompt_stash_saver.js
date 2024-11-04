@@ -11,7 +11,7 @@ app.registerExtension({
 
                 // this.size and this.setSize, neither worked, but this does?
                 this.computeSize = function() {
-                    return [210, 200];
+                    return [210, 220];  // Slightly taller to accommodate new dropdown
                 };
 
                 // Find our widgets
@@ -19,6 +19,7 @@ app.registerExtension({
                 const saveKeyWidget = this.widgets.find(w => w.name === "save_as_key");
                 const loadSavedWidget = this.widgets.find(w => w.name === "load_saved");
                 const useInputWidget = this.widgets.find(w => w.name === "use_input_text");
+                const promptListsWidget = this.widgets.find(w => w.name === "prompt_lists");
                 
                 // State tracking
                 this.isLoadingPrompt = false;
@@ -28,19 +29,39 @@ app.registerExtension({
                 saveKeyWidget.label = "Save Name";
                 loadSavedWidget.label = "Load Saved";
                 useInputWidget.label = "Use ____";
+                promptListsWidget.label = "List";
 
-                // Initialize the combo widget
+                // Initialize the combo widgets
                 if (loadSavedWidget) {
                     loadSavedWidget.type = "combo";
                     loadSavedWidget.options = loadSavedWidget.options || {};
                     loadSavedWidget.options.values = ["None"];
                 }
 
+                if (promptListsWidget) {
+                    promptListsWidget.type = "combo";
+                    promptListsWidget.options = promptListsWidget.options || {};
+                    promptListsWidget.options.values = ["default"];
+                }
+
+                // Update prompts dropdown when list changes
+                promptListsWidget.callback = () => {
+                    if (this.data?.lists) {
+                        const selectedList = promptListsWidget.value;
+                        const prompts = this.data.lists[selectedList] || {};
+                        loadSavedWidget.options.values = ["None", ...Object.keys(prompts)];
+                        loadSavedWidget.value = "None";
+                        this.serialize_widgets = true;
+                        app.graph.setDirtyCanvas(true, true);
+                    }
+                };
+
                 // Add watchers for both prompt and key changes
                 promptWidget.callback = (value, e) => {
                     const savedPromptKey = loadSavedWidget.value;
-                    if (savedPromptKey !== "None" && this.data?.prompts) {
-                        const savedPrompt = this.data.prompts[savedPromptKey];
+                    if (savedPromptKey !== "None" && this.data?.lists) {
+                        const selectedList = promptListsWidget.value;
+                        const savedPrompt = this.data.lists[selectedList]?.[savedPromptKey];
                         // Only clear selection if the prompt text doesn't match the saved value
                         if (promptWidget.value !== savedPrompt) {
                             loadSavedWidget.value = "None";
@@ -51,6 +72,7 @@ app.registerExtension({
                 };
 
                 saveKeyWidget.callback = () => {
+                    saveKeyWidget.value = saveKeyWidget.value.trim();
                     const savedPromptKey = loadSavedWidget.value;
                     if (savedPromptKey !== "None") {
                         // Only clear selection if the key doesn't match the selected value
@@ -60,19 +82,21 @@ app.registerExtension({
                             app.graph.setDirtyCanvas(true, true);
                         }
                     }
-                 };
+                };
 
                 // Add Save Button
                 this.addWidget("button", "Save Prompt", null, () => {
                     if (saveKeyWidget.value && promptWidget.value) {
                         const promptToSave = promptWidget.value;
-                        const keyToSave = saveKeyWidget.value;
+                        const keyToSave = saveKeyWidget.value.trim();
+                        const selectedList = promptListsWidget.value;
                         
                         api.fetchApi('/prompt_stash_saver/save', {
                             method: 'POST',
                             body: JSON.stringify({
                                 title: keyToSave,
                                 prompt: promptToSave,
+                                list_name: selectedList,
                                 node_id: this.id
                             })
                         });
@@ -85,6 +109,7 @@ app.registerExtension({
                 this.addWidget("button", "Delete Selected", null, () => {
                     if (loadSavedWidget.value !== "None") {
                         const deletedItemValue = loadSavedWidget.value;
+                        const selectedList = promptListsWidget.value;
                         // Get current list and find index of deleted item
                         const currentList = loadSavedWidget.options.values;
                         const deletedItemIndex = currentList.indexOf(deletedItemValue);
@@ -93,6 +118,7 @@ app.registerExtension({
                             method: 'POST',
                             body: JSON.stringify({
                                 title: deletedItemValue,
+                                list_name: selectedList,
                                 node_id: this.id
                             })
                         }).then(() => {
@@ -145,6 +171,7 @@ app.registerExtension({
                         method: 'POST',
                         body: JSON.stringify({
                             title: value,
+                            list_name: promptListsWidget.value,
                             node_id: this.id
                         })
                     }).then(response => response.json())
@@ -165,11 +192,18 @@ app.registerExtension({
                     this.loadPrompt(value, promptWidget, saveKeyWidget);
                 };
 
-                // Listen for initial data
+                // Listen for updates from server
                 api.addEventListener("prompt-stash-update-all", (event) => {
-                    this.data = {prompts: event.detail.prompts};
-                    if (loadSavedWidget && event.detail.prompts) {
-                        loadSavedWidget.options.values = ["None", ...Object.keys(event.detail.prompts)];
+                    this.data = event.detail;
+                    if (promptListsWidget && event.detail.lists) {
+                        // Update lists dropdown
+                        promptListsWidget.options.values = Object.keys(event.detail.lists);
+                        
+                        // Update prompts dropdown for current list
+                        const selectedList = promptListsWidget.value;
+                        const prompts = event.detail.lists[selectedList] || {};
+                        loadSavedWidget.options.values = ["None", ...Object.keys(prompts)];
+                        
                         this.setDirtyCanvas(true, true);
                     }
                 });
@@ -179,7 +213,7 @@ app.registerExtension({
                     if (String(event.detail.node_id) === String(this.id)) {
                         if (promptWidget) {
                             promptWidget.value = event.detail.prompt;
-                            saveKeyWidget.value = ""
+                            saveKeyWidget.value = "";
                             this.serialize_widgets = true;
                             app.graph.setDirtyCanvas(true, true);
                         }

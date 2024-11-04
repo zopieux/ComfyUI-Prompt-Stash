@@ -1,8 +1,8 @@
 [project]
 name = "comfyui-prompt-stash-saver"
-version = "1.0.0"
+version = "1.1.0"
 description = "A ComfyUI node for saving and managing prompts with persistent storage"
-license = { text = "MIT License" }
+license = { text = "Apache 2.0 License" }
 
 [project.urls]
 Homepage = "https://github.com/phazei/ConfyUI-node-prompt-stash-saver/"
