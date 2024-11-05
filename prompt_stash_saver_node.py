@@ -22,7 +22,10 @@ class PromptStashSaver:
                 "load_saved": ("STRING", {"default": "None"}), # Will be populated with actual prompts
                 "prompt_lists": ("STRING", {"default": "default"}), # Will be populated with actual lists
             },
-            "hidden": {"unique_id": "UNIQUE_ID"}
+            "hidden": {
+                "unique_id": "UNIQUE_ID",
+                "extra_pnginfo": "EXTRA_PNGINFO",
+            }
         }
 
     RETURN_TYPES = ("STRING",)
@@ -30,7 +33,7 @@ class PromptStashSaver:
     FUNCTION = "process"
     CATEGORY = "utils"
 
-    def check_lazy_status(self, text="", prompt_text="", save_as_key="", prompt_lists="default", use_input_text=False, load_saved="None", unique_id=None):
+    def check_lazy_status(self, use_input_text=False, text="", prompt_text="", save_as_key="", load_saved="None", prompt_lists="default", unique_id=None, extra_pnginfo=None):
         # Only need the text input if use_input_text is True
         needed = []
         if use_input_text:
@@ -95,7 +98,7 @@ class PromptStashSaver:
             return success
         return False
 
-    def process(self, text="", prompt_text="", save_as_key="", prompt_lists="default", use_input_text=False, load_saved="None", unique_id=None):
+    def process(self, use_input_text=False, text="", prompt_text="", save_as_key="", load_saved="None", prompt_lists="default", unique_id=None, extra_pnginfo=None):
         # Update the prompt text based on use_input_text toggle
         output_text = prompt_text
         if use_input_text and text is not None:
@@ -105,5 +108,21 @@ class PromptStashSaver:
                 "node_id": unique_id,
                 "prompt": text
             })
+
+            # Handle both list and dict formats of extra_pnginfo
+            workflow = None
+            if isinstance(extra_pnginfo, list) and len(extra_pnginfo) > 0:
+                workflow = extra_pnginfo[0].get("workflow")
+            elif isinstance(extra_pnginfo, dict):
+                workflow = extra_pnginfo.get("workflow")
+            if workflow:
+                node = next(
+                    (x for x in workflow["nodes"] if str(x["id"]) == str(unique_id)),
+                    None
+                )
+                if node and "widgets_values" in node:
+                    # Update the widget values in the workflow metadata
+                    prompt_text_index = 2  # Should match id of INPUT_TYPES order
+                    node["widgets_values"][prompt_text_index] = output_text
         
         return (output_text,)
