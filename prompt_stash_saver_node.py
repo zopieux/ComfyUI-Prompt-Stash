@@ -115,14 +115,19 @@ class PromptStashSaver:
                 workflow = extra_pnginfo[0].get("workflow")
             elif isinstance(extra_pnginfo, dict):
                 workflow = extra_pnginfo.get("workflow")
+
             if workflow:
                 node = next(
                     (x for x in workflow["nodes"] if str(x["id"]) == str(unique_id)),
                     None
                 )
                 if node and "widgets_values" in node:
-                    # Update the widget values in the workflow metadata
-                    prompt_text_index = 2  # Should match id of INPUT_TYPES order
-                    node["widgets_values"][prompt_text_index] = output_text
+                    # Set use_input_text to False in metadata (index 0 based on INPUT_TYPES order)
+                    use_input_text_index = 0  # First widget in optional inputs
+                    prompt_text_index = 2     # Third widget in optional inputs
+
+                    # Update the values in metadata
+                    node["widgets_values"][use_input_text_index] = False  # Force use_input_text to False in metadata
+                    node["widgets_values"][prompt_text_index] = output_text  # Update the prompt text
         
         return (output_text,)
