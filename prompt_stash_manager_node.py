@@ -1,11 +1,12 @@
 import os
 import json
 from server import PromptServer
+from .data_utils import init_data_file
 
 class PromptStashManager:
     def __init__(self):
         self.base_dir = os.path.dirname(os.path.realpath(__file__))
-        self.data_file = os.path.join(self.base_dir, "prompt_stash_data.json")
+        self.data_file = init_data_file(self.base_dir)
         self.data = self.load_data()
 
     @classmethod
