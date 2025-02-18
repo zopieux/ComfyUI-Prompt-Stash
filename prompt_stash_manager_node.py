@@ -16,7 +16,7 @@ class PromptStashManager:
             },
             "optional": {
                 "new_list_name": ("STRING", {"default": "", "placeholder": "Enter new list name"}),
-                "existing_lists": ("STRING", {"default": "default"}),
+                "existing_lists": ("COMBO", {"default": "default"}),
             }
         }
 

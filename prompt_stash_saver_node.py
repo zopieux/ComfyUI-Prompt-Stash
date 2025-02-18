@@ -20,8 +20,8 @@ class PromptStashSaver:
                 "text": ("STRING", {"default": "", "defaultInput": True, "tooltip": "Optional input text", "lazy": True}),
                 "prompt_text": ("STRING", {"multiline": True, "default": "", "placeholder": "Enter prompt text"}),
                 "save_as_key": ("STRING", {"default": "", "placeholder": "Enter key to save as"}),
-                "load_saved": ("STRING", {"default": "None"}), # Will be populated with actual prompts
-                "prompt_lists": ("STRING", {"default": "default"}), # Will be populated with actual lists
+                "load_saved": ("COMBO", {"default": "None"}), # Will be populated with actual prompts
+                "prompt_lists": ("COMBO", {"default": "default"}), # Will be populated with actual lists
             },
             "hidden": {
                 "unique_id": "UNIQUE_ID",

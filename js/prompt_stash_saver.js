@@ -45,7 +45,8 @@ app.registerExtension({
                 }
 
                 // Update prompts dropdown when list changes
-                promptListsWidget.callback = () => {
+                promptListsWidget.callback = (value) => {
+                    // promptListsWidget.value = value; //if type COMBO not needed
                     if (this.data?.lists) {
                         const selectedList = promptListsWidget.value;
                         const prompts = this.data.lists[selectedList] || {};
