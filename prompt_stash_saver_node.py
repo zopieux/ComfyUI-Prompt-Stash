@@ -17,7 +17,7 @@ class PromptStashSaver:
             },
             "optional": {
                 "use_input_text": ("BOOLEAN", {"default": False, "label_on": "Use Input", "label_off": "Use Prompt"}),
-                "text": ("STRING", {"default": "", "defaultInput": True, "tooltip": "Optional input text", "lazy": True}),
+                "text": ("STRING", {"default": "", "forceInput": True, "tooltip": "Optional input text", "lazy": True}),
                 "prompt_text": ("STRING", {"multiline": True, "default": "", "placeholder": "Enter prompt text"}),
                 "save_as_key": ("STRING", {"default": "", "placeholder": "Enter key to save as"}),
                 "load_saved": ("COMBO", {"default": "None"}), # Will be populated with actual prompts
@@ -125,7 +125,7 @@ class PromptStashSaver:
                 if node and "widgets_values" in node:
                     # Set use_input_text to False in metadata (index 0 based on INPUT_TYPES order)
                     use_input_text_index = 0  # First widget in optional inputs
-                    prompt_text_index = 2     # Third widget in optional inputs
+                    prompt_text_index = 1     # Second non-forceInput widget in optional inputs
 
                     # Update the values in metadata
                     node["widgets_values"][use_input_text_index] = False  # Force use_input_text to False in metadata
