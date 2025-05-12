@@ -1,3 +1,4 @@
+from .prompt_stash_passthrough_node import PromptStashPassthrough
 from .prompt_stash_saver_node import PromptStashSaver
 from .prompt_stash_manager_node import PromptStashManager
 from aiohttp import web
@@ -51,11 +52,13 @@ async def delete_list(request):
     return web.json_response({"success": success})
 
 NODE_CLASS_MAPPINGS = {
+    "PromptStashPassthrough": PromptStashPassthrough,
     "PromptStashSaver": PromptStashSaver,
     "PromptStashManager": PromptStashManager
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
+    "PromptStashPassthrough": "Prompt Stash Passthrough",
     "PromptStashSaver": "Prompt Stash Saver",
     "PromptStashManager": "Prompt Stash Manager"
 }

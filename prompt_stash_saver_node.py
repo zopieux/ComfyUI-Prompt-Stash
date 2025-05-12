@@ -1,6 +1,5 @@
 import os
 import json
-import folder_paths
 from server import PromptServer
 from .data_utils import init_data_file
 

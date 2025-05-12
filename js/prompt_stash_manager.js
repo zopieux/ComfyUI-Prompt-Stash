@@ -6,11 +6,11 @@ app.registerExtension({
     async beforeRegisterNodeDef(nodeType, nodeData) {
         if (nodeData.name === "PromptStashManager") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
-            nodeType.prototype.onNodeCreated = function() {
+            nodeType.prototype.onNodeCreated = function () {
                 onNodeCreated?.apply(this, arguments);
 
                 // Adjust the node size if needed
-                this.computeSize = function() {
+                this.computeSize = function () {
                     return [230, 110];  // Adjust dimensions as needed
                 };
 
@@ -46,8 +46,7 @@ app.registerExtension({
                         body: JSON.stringify({
                             list_name: listName
                         })
-                    }).then(response => response.json())
-                    .then(data => {
+                    }).then(response => response.json()).then(data => {
                         if (data.success) {
                             // Clear the newListNameWidget
                             newListNameWidget.value = "";
@@ -73,8 +72,7 @@ app.registerExtension({
                             body: JSON.stringify({
                                 list_name: selectedList
                             })
-                        }).then(response => response.json())
-                        .then(data => {
+                        }).then(response => response.json()).then(data => {
                             if (data.success) {
                                 let newSelection = "default";
 
@@ -105,6 +103,12 @@ app.registerExtension({
                     }
                 });
 
+                this.addWidget("button", "(Clear All Paused)", null, () => {
+                    api.fetchApi('/prompt_stash_passthrough/clear_all', {
+                        method: 'POST'
+                    });
+                });
+
                 // Listen for updates from server
                 api.addEventListener("prompt-stash-update-all", (event) => {
                     this.data = event.detail;
@@ -129,8 +133,7 @@ app.registerExtension({
                     body: JSON.stringify({
                         node_id: this.id
                     })
-                }).then(response => response.json())
-                .then(data => {
+                }).then(response => response.json()).then(data => {
                     this.data = data;
                     if (existingListsWidget && data.lists) {
                         // Update lists dropdown
