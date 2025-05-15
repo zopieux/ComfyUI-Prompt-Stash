@@ -7,7 +7,7 @@
 I created this because I couldn't find any nodes that would let me cache a prompt or create and save prompts. I wanted an easy way to cache results from the LLM and store them for later use. So, I made this plugin, and I hope others find it useful too. 😊
 
 
-![Workflow Diagram](./workflow.png)
+![Workflow Diagram](./example_workflows/PromptStashSample.png)
 
 
 ## Features ✨
